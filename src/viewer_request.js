@@ -1,4 +1,4 @@
-import { serialize } from "cookie";
+import * as cookie from "cookie";
 import { KameleoonClient } from "@kameleoon/nodejs-sdk";
 import { getClientConfig, generateRandomUserId } from "./helpers";
 
@@ -7,7 +7,6 @@ const KAMELEOON_SITE_CODE = "5gswtw0aep";
 
 exports.handler = async (event, context, callback) => {
   console.log("[KAMELEOON] Initializing function...");
-  console.log("VERSION: 5");
 
   let request = null;
   let headers = {};
@@ -24,16 +23,27 @@ exports.handler = async (event, context, callback) => {
   try {
     console.log("[KAMELEOON] Getting User ID...");
 
-    let userId = (cookies && cookies[KAMELEOON_USER_ID]) || "";
+    const parsedCookies =
+      cookies["cookie"] && cookies["cookie"][0]
+        ? cookie.parse(cookies["cookie"][0].value)
+        : {};
+
+    let userId = parsedCookies[KAMELEOON_USER_ID] || "";
 
     if (userId === "") {
       userId = generateRandomUserId();
       headers = {
         ...headers,
-        "Set-Cookie": serialize(KAMELEOON_USER_ID, userId),
+        "Set-Cookie": [
+          {
+            key: "Set-Cookie",
+            value: cookie.serialize(KAMELEOON_USER_ID, userId),
+          },
+        ],
       };
     }
 
+    console.log(`[KAMELEOON] HEADERS: ${JSON.stringify(headers)}`);
     console.log(`[KAMELEOON] Using User ID: ${userId}`);
     console.log(`[KAMELEOON] Using site code: ${KAMELEOON_SITE_CODE}`);
 

@@ -8,7 +8,7 @@ const https = require("https");
 export function generateRandomUserId() {
   console.log("[KAMELEOON] Generating new random User ID...");
   const userId = (Math.random() + 1).toString(32).substring(2);
-  console.log("[KAMELEOON] Generated User ID: " + userId);
+  console.log(`[KAMELEOON] Generated User ID: ${userId}`);
 
   return userId;
 }
@@ -20,7 +20,7 @@ export function generateRandomUserId() {
  * @returns Promise
  */
 async function getClientConfigRequest(siteCode) {
-  console.log("[KAMELEOON] Retrieving client config: " + siteCode);
+  console.log(`[KAMELEOON] Retrieving client config: ${siteCode}`);
   return new Promise((resolve, reject) => {
     const options = {
       hostname: "client-config.kameleoon.com",
@@ -57,10 +57,10 @@ async function getClientConfigRequest(siteCode) {
   });
 }
 
-// const TTL = 3600000; // 1 Hour
-const TTL = 60000; // 1 Minute
+// const CLIENT_CONFIG_TTL = 3600000; // 1 Hour
+const CLIENT_CONFIG_TTL = 600000; // 1 Minute
 let clientConfig = null;
-let lastFetchedTime = 0; // Note last time the client confiruation was fetched.
+let clientConfigLastFetchedTime = 0; // Last time the client confiruation was fetched.
 
 /**
  * getClientConfig - Retrieves the client configuration from the Kameeloon CDN.
@@ -75,11 +75,12 @@ export async function getClientConfig(siteCode) {
   console.log("[KAMELEOON] Getting client config...");
 
   try {
-    console.log(
-      `[KAMELEOON] Checking if client config is stale. Current time: ${Date.now()}. Last fetched time: ${lastFetchedTime}. TTL: ${TTL}`
-    );
+    const currentTime = Date.now();
 
-    if (!clientConfig) {
+    if (
+      !clientConfig ||
+      currentTime - clientConfigLastFetchedTime > CLIENT_CONFIG_TTL
+    ) {
       console.log(
         "[KAMELEOON] Cached client config is stale, fetching new client config..."
       );
@@ -87,20 +88,15 @@ export async function getClientConfig(siteCode) {
       clientConfig = await getClientConfigRequest(siteCode);
 
       console.log(
-        "[KAMELEOON] Client config response: " + JSON.stringify(clientConfig)
+        `[KAMELEOON] Client config response: ${JSON.stringify(clientConfig)}`
       );
 
-      // In-memory cache reset mechanism.
-      // setTimeout(() => {
-      //   clientConfig = null;
-      // }, TTL);
-
-      lastFetchedTime = Date.now();
+      clientConfigLastFetchedTime = currentTime;
     }
 
     console.log(
       `[KAMELEOON] Client config last fetched time: ${new Date(
-        lastFetchedTime
+        clientConfigLastFetchedTime
       ).toLocaleTimeString()}`
     );
 
