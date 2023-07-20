@@ -5,15 +5,15 @@ import { getClientConfig, generateRandomUserId } from "./helpers";
 const KAMELEOON_USER_ID = "kameleoon_user_id";
 const KAMELEOON_SITE_CODE = "5gswtw0aep";
 
-exports.handler = async (event, context, callback) => {
+exports.handler = async (event, _, callback) => {
   console.log("[KAMELEOON] Initializing function...");
 
   let request = null;
   let headers = {};
   let cookies = {};
-  request = event.Records[0].cf.request;
 
   try {
+    request = event.Records[0].cf.request;
     headers = request.headers;
     cookies = headers.cookie;
   } catch (error) {
@@ -43,7 +43,6 @@ exports.handler = async (event, context, callback) => {
       };
     }
 
-    console.log(`[KAMELEOON] HEADERS: ${JSON.stringify(headers)}`);
     console.log(`[KAMELEOON] Using User ID: ${userId}`);
     console.log(`[KAMELEOON] Using site code: ${KAMELEOON_SITE_CODE}`);
 
@@ -52,7 +51,7 @@ exports.handler = async (event, context, callback) => {
     // const kameleoonClient = new KameleoonClient({
     //   siteCode: KAMELEOON_SITE_CODE,
     //   integrations: {
-    //     externalClientConfiguration: clientConfig,
+    //     externalClientConfiguration: clientConfig
     //   },
     // });
 
