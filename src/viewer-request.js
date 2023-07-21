@@ -73,24 +73,24 @@ exports.handler = async (event, _, callback) => {
     const clientConfig = await getClientConfig(KAMELEOON_SITE_CODE);
 
     // 3. Initialize KameleoonClient SDK: Create an instance of KameleoonClient using fetched client configuration
-    // const kameleoonClient = new KameleoonClient({
-    //   siteCode: KAMELEOON_SITE_CODE,
-    //   integrations: {
-    //     externalClientConfiguration: clientConfig,
-    //   },
-    // });
+    const kameleoonClient = new KameleoonClient({
+      siteCode: KAMELEOON_SITE_CODE,
+      integrations: {
+        externalClientConfiguration: clientConfig,
+      },
+    });
 
     // await kameleoonClient.initialize();
 
     // 4. Use kameleoonClient instance to access SDK methods. You can refer to our developers documentation to find out more about methods
     //    Here is the simple example of how to get the variationKey for this particular userId and feature flag.
-    // const variationKey = kameleoonClient.getFeatureFlagVariationKey(
-    //   userId,
-    //   "test_fastly_starter_kit"
-    // );
-    // console.log(
-    //   `[KAMELEOON] The variationKey of userId: ${userId} is ${variationKey}`
-    // );
+    const variationKey = kameleoonClient.getFeatureFlagVariationKey(
+      userId,
+      "test_fastly_starter_kit"
+    );
+    console.log(
+      `[KAMELEOON] The variationKey of userId: ${userId} is ${variationKey}`
+    );
 
     // 5. Result: Return the result to the caller via appending headers or cookies to the callback function.
 
