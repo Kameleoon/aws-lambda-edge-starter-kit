@@ -58,7 +58,7 @@ async function getClientConfigRequest(siteCode) {
 }
 
 // const CLIENT_CONFIG_TTL = 3600000; // 1 Hour
-const CLIENT_CONFIG_TTL = 600000; // 1 Minute
+const CLIENT_CONFIG_TTL = 60000; // 1 Minute
 let clientConfig = null;
 let clientConfigLastFetchedTime = 0; // Last time the client confiruation was fetched.
 

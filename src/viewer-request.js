@@ -80,7 +80,7 @@ exports.handler = async (event, _, callback) => {
       },
     });
 
-    // await kameleoonClient.initialize();
+    await kameleoonClient.initialize();
 
     // 4. Use kameleoonClient instance to access SDK methods. You can refer to our developers documentation to find out more about methods
     //    Here is the simple example of how to get the variationKey for this particular userId and feature flag.
