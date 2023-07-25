@@ -1,5 +1,9 @@
+import { CloudFrontRequestEvent } from "aws-lambda";
 import https from "https";
+import cookie from "cookie";
 import { GetClientConfigurationResultType } from "@kameleoon/nodejs-sdk";
+import { TypeCookies, TypeRequestandHeaderResponse } from "./types";
+import { KAMELEOON_USER_ID } from "./constants";
 
 /**
  * generateRandomUserId - Generates a random User ID.
@@ -10,6 +14,41 @@ export function generateRandomUserId(): string {
   console.log("[KAMELEOON] Generating new random User ID...");
   const userId = (Math.random() + 1).toString(32).substring(2);
   console.log(`[KAMELEOON] Generated User ID: ${userId}`);
+
+  return userId;
+}
+
+/**
+ * getRequestAndHeaders - Get the request object from event and headers object from request.
+ *
+ * @param CloudFrontRequestEvent event
+ * @returns object with values such as request, headers and cookieHeader
+ */
+export function getRequestAndHeaders(
+  event: CloudFrontRequestEvent
+): TypeRequestandHeaderResponse {
+  const request = event.Records[0].cf.request;
+  const headers = request?.headers || {};
+  const cookieHeader = headers["cookie"] ?? [];
+
+  return { request, headers, cookieHeader };
+}
+
+/**
+ * getUserId - Get the User ID from cookie header, if missing returns empty string.
+ *
+ * @param TypeCookies[] cookieHeader
+ * @returns userId
+ */
+export function getUserId(cookieHeader: TypeCookies[]): string {
+  let userId = "";
+
+  if (cookieHeader.length) {
+    const cookieValue = cookieHeader[0].value;
+    const cookies = cookie.parse(cookieValue);
+
+    userId = cookies[KAMELEOON_USER_ID] || "";
+  }
 
   return userId;
 }
@@ -62,7 +101,7 @@ async function getClientConfigRequest(
 }
 
 // const CLIENT_CONFIG_TTL = 3_600_000; // 1 Hour
-const CLIENT_CONFIG_TTL: number = 10_000; // 1 Minute
+const CLIENT_CONFIG_TTL: number = 60_000; // 1 Minute
 let clientConfig: GetClientConfigurationResultType | null = null;
 let clientConfigLastFetchedTime: number = 0; // Last time the client confiruation was fetched.
 

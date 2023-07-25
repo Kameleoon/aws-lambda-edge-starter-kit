@@ -1,15 +1,13 @@
-import {
-  Context,
-  CloudFrontHeaders,
-  CloudFrontRequestEvent,
-  CloudFrontRequestResult,
-  CloudFrontRequestCallback,
-} from "aws-lambda";
+import { CloudFrontRequestEvent, CloudFrontRequest } from "aws-lambda";
 import cookie from "cookie";
 import { KameleoonClient } from "@kameleoon/nodejs-sdk";
-import { getClientConfig, generateRandomUserId } from "./helpers";
+import {
+  getClientConfig,
+  generateRandomUserId,
+  getRequestAndHeaders,
+  getUserId,
+} from "./helpers";
 import { KAMELEOON_USER_ID } from "./constants";
-import { TypeCookies } from "./types";
 
 const KAMELEOON_SITE_CODE = "5gswtw0aep";
 
@@ -22,61 +20,27 @@ const KAMELEOON_SITE_CODE = "5gswtw0aep";
  * 5. Result: Return the result to the caller via appending headers or cookies to the callback function.
  */
 exports.handler = async (
-  event: CloudFrontRequestEvent,
-  _: Context,
-  callback: CloudFrontRequestCallback
-): Promise<void> => {
+  event: CloudFrontRequestEvent
+): Promise<CloudFrontRequest | null> => {
   console.log("[KAMELEOON] Initializing function...");
 
-  let request: CloudFrontRequestResult = null;
-
   try {
-    request = event.Records[0].cf.request;
-  } catch (error) {
-    console.log(
-      "[KAMELEOON] WARNING: Unable to get request object from event."
-    );
-  }
+    const { request, headers, cookieHeader } = getRequestAndHeaders(event);
 
-  let headers: CloudFrontHeaders = {};
-  let cookieHeader: TypeCookies[] = [];
-
-  try {
-    if (request) {
-      headers = request.headers;
-      cookieHeader = headers["cookie"] ?? [];
-    }
-  } catch (error) {
-    console.log(
-      "[KAMELEOON] WARNING: Unable to get headers object from request."
-    );
-  }
-
-  let userId = "";
-
-  try {
     console.log("[KAMELEOON] Getting User ID...");
 
     // 1. User ID: Get the useId from cookie if it exists. Otherwise, generate a new userId.
     //    If userId is missing in request header cookie, then attach it to request header.
-    if (cookieHeader.length) {
-      const cookieValue = cookieHeader[0].value;
-      const cookies = cookie.parse(cookieValue);
+    let userId = getUserId(cookieHeader);
 
-      userId = cookies[KAMELEOON_USER_ID] || "";
-    }
-
-    if (!cookieHeader.length || !userId) {
+    if (!userId) {
       userId = generateRandomUserId();
-      headers = {
-        ...headers,
-        Cookie: [
-          {
-            key: "Cookie",
-            value: cookie.serialize(KAMELEOON_USER_ID, userId),
-          },
-        ],
-      };
+      headers.Cookie = [
+        {
+          key: "Cookie",
+          value: cookie.serialize(KAMELEOON_USER_ID, userId),
+        },
+      ];
     }
 
     console.log(`[KAMELEOON] Using User ID: ${userId}`);
@@ -108,25 +72,20 @@ exports.handler = async (
     // 5. Result: Return the result to the caller via appending headers or cookies to the callback function.
 
     // Example of attaching the result of `getFeatureFlagVariationKey` method to header to pass it a caller
-    // headers["<YOUR_FEATURE_KEY>"] = [
-    //   {
-    //     key: "<YOUR_FEATURE_KEY>",
-    //     value: variationKey,
-    //   },
-    // ];
+    request.headers["test_fastly_starter_kit"] = [
+      {
+        key: "test_fastly_starter_kit",
+        value: variationKey,
+      },
+    ];
 
-    // Here, you can include any other loficto handle the viewer request event.
+    // Here, you can include any other parameters you want to pass along.
 
-    if (request) {
-      request = {
-        ...request,
-        headers,
-      };
-    }
+    request.headers = headers;
 
-    callback(null, request);
+    return request;
   } catch (error) {
     console.log(`[KAMELEOON] ERROR: generating viewer request: ${error}`);
-    callback(null, request);
+    return null;
   }
 };

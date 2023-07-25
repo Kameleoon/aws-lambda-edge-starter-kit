@@ -5,7 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf dist && rollup -c && cd dist && zip -r dist.zip index.js && rm index.js",
     "build:viewer-request": "rm -rf dist && tsc --noEmit && rollup -c && cd dist && mv viewer-request.js index.js && zip -r dist.zip index.js && rm index.js",
     "build:viewer-response": "rm -rf dist && tsc --noEmit && rollup -c && cd dist && mv viewer-response.js index.js && zip -r dist.zip index.js && rm index.js"
   },

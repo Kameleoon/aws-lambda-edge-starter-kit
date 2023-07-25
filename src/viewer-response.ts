@@ -1,13 +1,11 @@
 import {
   Context,
   CloudFrontResponseEvent,
-  CloudFrontRequestResult,
-  CloudFrontResponseResult,
   CloudFrontResponseCallback,
 } from "aws-lambda";
 import * as cookie from "cookie";
 import { KAMELEOON_USER_ID } from "./constants";
-import { TypeCookies } from "./types";
+import { getRequestAndHeaders, getUserId } from "./helpers";
 
 /**
  * Handler function is called when Lambda function is invoked.
@@ -20,60 +18,25 @@ exports.handler = (
   callback: CloudFrontResponseCallback
 ) => {
   try {
-    let request: CloudFrontRequestResult = null;
+    const { cookieHeader } = getRequestAndHeaders(event);
+    const response = event.Records[0].cf.response;
 
-    try {
-      request = event.Records[0].cf.request;
-    } catch (error) {
+    const userId = getUserId(cookieHeader);
+
+    if (userId) {
       console.log(
-        "[KAMELEOON] WARNING: Unable to get request object from event."
+        `[KAMELEOON]: ${KAMELEOON_USER_ID} cookie found and it's value is ${userId}`
       );
-    }
 
-    let cookieHeader: TypeCookies[] = [];
-
-    try {
-      if (request) {
-        const headers = request.headers;
-        cookieHeader = headers["cookie"] ?? [];
-      }
-    } catch (error) {
-      console.log(
-        "[KAMELEOON] WARNING: Unable to get headers object from request."
-      );
-    }
-
-    let response: CloudFrontResponseResult = null;
-
-    try {
-      response = event.Records[0].cf.response;
-    } catch (error) {
-      console.log(
-        "[KAMELEOON] WARNING: Unable to get response object from event."
-      );
-    }
-
-    if (cookieHeader.length) {
-      const cookieValue = cookieHeader[0].value;
-      const cookies = cookie.parse(cookieValue);
-
-      const userId = cookies[KAMELEOON_USER_ID] || "";
-
-      if (response && userId) {
-        console.log(
-          `[KAMELEOON]: ${KAMELEOON_USER_ID} cookie found and it's value is ${userId}`
-        );
-
-        response.headers = {
-          ...response.headers,
-          "Set-Cookie": [
-            {
-              key: "Set-Cookie",
-              value: cookie.serialize(KAMELEOON_USER_ID, userId),
-            },
-          ],
-        };
-      }
+      response.headers = {
+        ...response.headers,
+        "Set-Cookie": [
+          {
+            key: "Set-Cookie",
+            value: cookie.serialize(KAMELEOON_USER_ID, userId),
+          },
+        ],
+      };
     }
 
     // Here, you can include any other parameters you want to pass along.
