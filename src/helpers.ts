@@ -1,11 +1,12 @@
-const https = require("https");
+import https from "https";
+import { GetClientConfigurationResultType } from "@kameleoon/nodejs-sdk";
 
 /**
  * generateRandomUserId - Generates a random User ID.
  *
  * @returns string
  */
-export function generateRandomUserId() {
+export function generateRandomUserId(): string {
   console.log("[KAMELEOON] Generating new random User ID...");
   const userId = (Math.random() + 1).toString(32).substring(2);
   console.log(`[KAMELEOON] Generated User ID: ${userId}`);
@@ -19,8 +20,11 @@ export function generateRandomUserId() {
  * @param string siteCode
  * @returns Promise
  */
-async function getClientConfigRequest(siteCode) {
+async function getClientConfigRequest(
+  siteCode: string
+): Promise<GetClientConfigurationResultType> {
   console.log(`[KAMELEOON] Retrieving client config: ${siteCode}`);
+
   return new Promise((resolve, reject) => {
     const options = {
       hostname: "client-config.kameleoon.com",
@@ -44,7 +48,7 @@ async function getClientConfigRequest(siteCode) {
         try {
           resolve(JSON.parse(responseBody));
         } catch (err) {
-          reject(new Error(err));
+          reject(new Error(err as string));
         }
       });
     });
@@ -57,10 +61,10 @@ async function getClientConfigRequest(siteCode) {
   });
 }
 
-// const CLIENT_CONFIG_TTL = 3600000; // 1 Hour
-const CLIENT_CONFIG_TTL = 60000; // 1 Minute
-let clientConfig = null;
-let clientConfigLastFetchedTime = 0; // Last time the client confiruation was fetched.
+// const CLIENT_CONFIG_TTL = 3_600_000; // 1 Hour
+const CLIENT_CONFIG_TTL: number = 10_000; // 1 Minute
+let clientConfig: GetClientConfigurationResultType | null = null;
+let clientConfigLastFetchedTime: number = 0; // Last time the client confiruation was fetched.
 
 /**
  * getClientConfig - Retrieves the client configuration from the Kameeloon CDN.
@@ -71,7 +75,9 @@ let clientConfigLastFetchedTime = 0; // Last time the client confiruation was fe
  * @param string siteCode
  * @returns client config JSON object or null in case of error
  */
-export async function getClientConfig(siteCode) {
+export async function getClientConfig(
+  siteCode: string
+): Promise<GetClientConfigurationResultType | null> {
   console.log("[KAMELEOON] Getting client config...");
 
   try {

@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf dist && rollup -c && cd dist && zip -r dist.zip index.js && rm index.js",
-    "build:viewer-request": "rm -rf dist && rollup -c && cd dist && mv viewer-request.js index.js && zip -r dist.zip index.js && rm index.js",
-    "build:viewer-response": "rm -rf dist && rollup -c && cd dist && mv viewer-response.js index.js && zip -r dist.zip index.js && rm index.js"
+    "build:viewer-request": "rm -rf dist && tsc --noEmit && rollup -c && cd dist && mv viewer-request.js index.js && zip -r dist.zip index.js && rm index.js",
+    "build:viewer-response": "rm -rf dist && tsc --noEmit && rollup -c && cd dist && mv viewer-response.js index.js && zip -r dist.zip index.js && rm index.js"
   },
   "repository": {
     "type": "git",
@@ -33,16 +33,19 @@
   "homepage": "https://github.com/Kameleoon/aws-lambda-edge-starter-kit#readme",
   "dependencies": {
     "@kameleoon/nodejs-sdk": "^2.4.0",
+    "aws-lambda": "^1.0.7",
     "cookie": "^0.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
     "@babel/preset-env": "^7.22.9",
+    "@babel/preset-typescript": "^7.22.5",
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-commonjs": "^25.0.3",
     "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.1.0",
-    "parcel": "^2.9.3",
+    "@types/aws-lambda": "^8.10.119",
+    "@types/cookie": "^0.5.1",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-terser": "^7.0.2"

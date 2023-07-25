@@ -6,14 +6,17 @@ import json from "@rollup/plugin-json";
 import { terser } from "rollup-plugin-terser";
 
 export default {
-  input: "src/viewer-request.js",
+  input: "src/viewer-request.ts",
   output: {
     format: "cjs",
     dir: "dist",
   },
   preserveModules: false,
   plugins: [
-    nodeResolve(),
+    nodeResolve({
+      preferBuiltins: true,
+      extensions: [".js", ".ts"],
+    }),
     commonjs(),
     json(),
     copy({
@@ -27,7 +30,8 @@ export default {
     babel({
       exclude: "node_modules/**",
       babelHelpers: "bundled",
-      presets: ["@babel/preset-env"],
+      extensions: [".js", ".ts"],
+      presets: ["@babel/preset-env", "@babel/preset-typescript"],
     }),
     terser({
       format: {

@@ -1,7 +1,15 @@
-import * as cookie from "cookie";
+import {
+  Context,
+  CloudFrontHeaders,
+  CloudFrontRequestEvent,
+  CloudFrontRequestResult,
+  CloudFrontRequestCallback,
+} from "aws-lambda";
+import cookie from "cookie";
 import { KameleoonClient } from "@kameleoon/nodejs-sdk";
 import { getClientConfig, generateRandomUserId } from "./helpers";
 import { KAMELEOON_USER_ID } from "./constants";
+import { TypeCookies } from "./types";
 
 const KAMELEOON_SITE_CODE = "5gswtw0aep";
 
@@ -13,11 +21,14 @@ const KAMELEOON_SITE_CODE = "5gswtw0aep";
  * 4. Use kameleoonClient instance to access SDK methods. Using methdos get result for this particular userId.
  * 5. Result: Return the result to the caller via appending headers or cookies to the callback function.
  */
-
-exports.handler = async (event, _, callback) => {
+exports.handler = async (
+  event: CloudFrontRequestEvent,
+  _: Context,
+  callback: CloudFrontRequestCallback
+): Promise<void> => {
   console.log("[KAMELEOON] Initializing function...");
 
-  let request = null;
+  let request: CloudFrontRequestResult = null;
 
   try {
     request = event.Records[0].cf.request;
@@ -27,12 +38,14 @@ exports.handler = async (event, _, callback) => {
     );
   }
 
-  let headers = {};
-  let cookieHeader = [];
+  let headers: CloudFrontHeaders = {};
+  let cookieHeader: TypeCookies[] = [];
 
   try {
-    headers = request.headers;
-    cookieHeader = headers["cookie"] ?? [];
+    if (request) {
+      headers = request.headers;
+      cookieHeader = headers["cookie"] ?? [];
+    }
   } catch (error) {
     console.log(
       "[KAMELEOON] WARNING: Unable to get headers object from request."
@@ -76,7 +89,7 @@ exports.handler = async (event, _, callback) => {
     const kameleoonClient = new KameleoonClient({
       siteCode: KAMELEOON_SITE_CODE,
       integrations: {
-        externalClientConfiguration: clientConfig,
+        externalClientConfiguration: clientConfig ?? undefined,
       },
     });
 
@@ -104,10 +117,12 @@ exports.handler = async (event, _, callback) => {
 
     // Here, you can include any other loficto handle the viewer request event.
 
-    request = {
-      ...request,
-      headers,
-    };
+    if (request) {
+      request = {
+        ...request,
+        headers,
+      };
+    }
 
     callback(null, request);
   } catch (error) {

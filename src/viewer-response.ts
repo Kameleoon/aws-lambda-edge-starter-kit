@@ -1,16 +1,26 @@
-/**
- * Create a new Lambda@Edge function with Viewer Response trigger
- * of Cloudfront Distrubution.
- *
- * This handler will capture the generated userId cookie and return it to the client.
- */
-
+import {
+  Context,
+  CloudFrontResponseEvent,
+  CloudFrontRequestResult,
+  CloudFrontResponseResult,
+  CloudFrontResponseCallback,
+} from "aws-lambda";
 import * as cookie from "cookie";
 import { KAMELEOON_USER_ID } from "./constants";
+import { TypeCookies } from "./types";
 
-exports.handler = (event, _, callback) => {
+/**
+ * Handler function is called when Lambda function is invoked.
+ * 1. User ID: capture the generated userId cookie.
+ * 2. Result: Return the result to the caller via appending userId to headers.
+ */
+exports.handler = (
+  event: CloudFrontResponseEvent,
+  _: Context,
+  callback: CloudFrontResponseCallback
+) => {
   try {
-    let request = null;
+    let request: CloudFrontRequestResult = null;
 
     try {
       request = event.Records[0].cf.request;
@@ -20,18 +30,20 @@ exports.handler = (event, _, callback) => {
       );
     }
 
-    let cookieHeader = [];
+    let cookieHeader: TypeCookies[] = [];
 
     try {
-      const headers = request.headers;
-      cookieHeader = headers["cookie"] ?? [];
+      if (request) {
+        const headers = request.headers;
+        cookieHeader = headers["cookie"] ?? [];
+      }
     } catch (error) {
       console.log(
         "[KAMELEOON] WARNING: Unable to get headers object from request."
       );
     }
 
-    let response = null;
+    let response: CloudFrontResponseResult = null;
 
     try {
       response = event.Records[0].cf.response;
@@ -47,7 +59,7 @@ exports.handler = (event, _, callback) => {
 
       const userId = cookies[KAMELEOON_USER_ID] || "";
 
-      if (userId) {
+      if (response && userId) {
         console.log(
           `[KAMELEOON]: ${KAMELEOON_USER_ID} cookie found and it's value is ${userId}`
         );
