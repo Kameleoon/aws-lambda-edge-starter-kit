@@ -39,7 +39,7 @@ exports.handler = (
       };
     }
 
-    // Here, you can include any other parameters you want to pass along.
+    // Here, you can include your own logic to handle the viewer response.
 
     callback(null, response);
   } catch (error) {

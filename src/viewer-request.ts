@@ -9,7 +9,7 @@ import {
 } from "./helpers";
 import { KAMELEOON_USER_ID } from "./constants";
 
-const KAMELEOON_SITE_CODE = "5gswtw0aep";
+const KAMELEOON_SITE_CODE = "YOUR_SITE_CODE";
 
 /**
  * Handler function is called when Lambda function is invoked.
@@ -61,25 +61,26 @@ exports.handler = async (
 
     // 4. Use kameleoonClient instance to access SDK methods. You can refer to our developers documentation to find out more about methods
     //    Here is the simple example of how to get the variationKey for this particular userId and feature flag.
+    const featureKey = "YOUR_FEATURE_KEY";
     const variationKey = kameleoonClient.getFeatureFlagVariationKey(
       userId,
-      "test_fastly_starter_kit"
+      featureKey
     );
     console.log(
       `[KAMELEOON] The variationKey of userId: ${userId} is ${variationKey}`
     );
 
-    // 5. Result: Return the result to the caller via appending headers or cookies to the callback function.
+    // 5. Result: Return the result to the caller via appending headers or cookies to the request.
 
     // Example of attaching the result of `getFeatureFlagVariationKey` method to header to pass it a caller
-    request.headers["test_fastly_starter_kit"] = [
+    request.headers[featureKey] = [
       {
-        key: "test_fastly_starter_kit",
+        key: featureKey,
         value: variationKey,
       },
     ];
 
-    // Here, you can include any other parameters you want to pass along.
+    // Here, you can include your own logic to handle the viewer request.
 
     request.headers = headers;
 
