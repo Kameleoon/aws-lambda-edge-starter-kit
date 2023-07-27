@@ -11,6 +11,8 @@ import { getRequestAndHeaders, getUserId } from "./helpers";
  * Handler function is called when Lambda function is invoked.
  * 1. User ID: capture the generated userId cookie.
  * 2. Result: Return the result to the caller via appending userId to headers.
+ *
+ * NOTE: Additionally, you can capture the result of `getFeatureFlagVariationKey` from headers and pass it's value to user
  */
 exports.handler = (
   event: CloudFrontResponseEvent,
