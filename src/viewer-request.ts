@@ -50,6 +50,8 @@ exports.handler = async (
     const clientConfig = await getClientConfig(KAMELEOON_SITE_CODE);
 
     // 3. Initialize KameleoonClient SDK: Create an instance of KameleoonClient using fetched client configuration
+    // NOTE: If you are not fetching client config externally as here, but using default SDK polling.
+    // You can initialize the KameleoonClient outside of Lambda Function, this way in warm start it is not created again.
     const kameleoonClient = new KameleoonClient({
       siteCode: KAMELEOON_SITE_CODE,
       integrations: {
