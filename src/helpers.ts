@@ -1,7 +1,10 @@
 import { CloudFrontRequestEvent } from "aws-lambda";
 import https from "https";
 import cookie from "cookie";
-import { GetClientConfigurationResultType } from "@kameleoon/nodejs-sdk";
+import {
+  KameleoonUtils,
+  GetClientConfigurationResultType,
+} from "@kameleoon/nodejs-sdk";
 import { TypeCookies, TypeRequestandHeaderResponse } from "./types";
 import { KAMELEOON_USER_ID } from "./constants";
 
@@ -60,15 +63,17 @@ export function getUserId(cookieHeader: TypeCookies[]): string {
  * @returns Promise
  */
 async function getClientConfigRequest(
-  siteCode: string
+  url: string
 ): Promise<GetClientConfigurationResultType> {
-  console.log(`[KAMELEOON] Retrieving client config: ${siteCode}`);
+  console.log("[KAMELEOON] Retrieving client config...");
+
+  const urlObj = new URL(url);
 
   return new Promise((resolve, reject) => {
     const options = {
-      hostname: "client-config.kameleoon.com",
-      port: 443,
-      path: `/mobile?siteCode=${siteCode}`,
+      hostname: urlObj.hostname,
+      port: urlObj.port || 443,
+      path: urlObj.pathname + urlObj.search,
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -119,6 +124,9 @@ export async function getClientConfig(
 ): Promise<GetClientConfigurationResultType | null> {
   console.log("[KAMELEOON] Getting client config...");
 
+  // Get the Kameleoon Client Configuration URL from KameleoonUtils
+  const url = KameleoonUtils.getClientConfigurationUrl(siteCode);
+
   try {
     const currentTime = Date.now();
 
@@ -130,7 +138,7 @@ export async function getClientConfig(
         "[KAMELEOON] Cached client config is stale, fetching new client config..."
       );
 
-      clientConfig = await getClientConfigRequest(siteCode);
+      clientConfig = await getClientConfigRequest(url);
 
       console.log(
         `[KAMELEOON] Client config response: ${JSON.stringify(clientConfig)}`

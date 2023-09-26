@@ -5,6 +5,13 @@ All notable changes to this AWS Lambda@Edge project will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.2] - September 26, 2023
+
+### Changed
+
+- Bump @kameleoon/nodejs-sdk version to 2.7.0
+- Use new `getClientConfigurationUrl` utility
+
 ## [1.0.1] - September 07, 2023
 
 ### Changed
