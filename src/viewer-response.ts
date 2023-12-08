@@ -4,7 +4,7 @@ import {
   CloudFrontResponseCallback,
 } from "aws-lambda";
 import * as cookie from "cookie";
-import { KAMELEOON_USER_ID } from "./constants";
+import { KAMELEOON_COOKIE_KEY } from "./constants";
 import { getRequestAndHeaders, getUserId } from "./helpers";
 
 /**
@@ -27,7 +27,7 @@ exports.handler = (
 
     if (userId) {
       console.log(
-        `[KAMELEOON]: ${KAMELEOON_USER_ID} cookie found and it's value is ${userId}`
+        `[KAMELEOON]: ${KAMELEOON_COOKIE_KEY} cookie found and it's value is ${userId}`
       );
 
       response.headers = {
@@ -35,7 +35,7 @@ exports.handler = (
         "Set-Cookie": [
           {
             key: "Set-Cookie",
-            value: cookie.serialize(KAMELEOON_USER_ID, userId),
+            value: cookie.serialize(KAMELEOON_COOKIE_KEY, userId),
           },
         ],
       };

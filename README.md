@@ -55,7 +55,7 @@ In the `src` folder of the starter kit, you'll find three JavaScript files:
 
 You'll use these files to initialize your environment:
 
-1. Navigate to `src/viewer_request.js` and update the `YOUR_SITE_CODE` and `YOUR_FEATURE_KEY` values with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials).
+1. Navigate to `src/viewer_request.js` and update the `YOUR_SITE_CODE`, `YOUR_FEATURE_KEY`, `YOUR_CLIENT_ID` and `YOUR_CLIENT_SECRET` values with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials).
 1. Review or adjust the feature flags or experiments you've configured with the Kameleoon NodeJS SDK, and hook into the lifecycle events by inserting your desired logic into the switch-case statements in `src/viewer_request.js` and `src/viewer_response.js`. For example, you can change headers, cookies, and more.
 1. Run `npm run build:viewer_request` to use Rollup to bundle the source code of `src/viewer_request.js` into a `dist/dist.zip` file that you'll import into Lambda. The `dist.zip` file should be roughly **~49kb** in size for `src/viewer_request.js` assuming you have not made any additional changes.
 1. Upload the request `dist/dist.zip` file into Lambda using one of these options:
@@ -95,7 +95,7 @@ For even faster data fetching, consider storing your data file in an S3 bucket t
 
 ### Identity Management
 
-Out of the box, Kameleoon's SDKs require a user-provided identifier at runtime to drive experimentation and feature flag results. If the client doesn't provide the User ID directly, this starter kit generates a unique ID as a fallback, stores it into the cookie, and re-uses it to ensure decisions are consistent throughout the user session. Alternatively, you can use an existing unique identifier available within your application and pass it in as the value for the `KAMELEOON_USER_ID` cookie.
+Out of the box, Kameleoon's SDKs require a user-provided identifier at runtime to drive experimentation and feature flag results. If the client doesn't provide the User ID directly, this starter kit generates a unique ID as a fallback, stores it into the cookie, and re-uses it to ensure decisions are consistent throughout the user session. Alternatively, you can use an existing unique identifier available within your application and pass it in as the value for the `KAMELEOON_COOKIE_KEY` cookie.
 
 ### AWS Lambda@Edge and Kameleoon resources
 

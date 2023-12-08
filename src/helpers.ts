@@ -3,10 +3,10 @@ import https from "https";
 import cookie from "cookie";
 import {
   KameleoonUtils,
-  GetClientConfigurationResultType,
+  ConfigurationDataType,
 } from "@kameleoon/nodejs-sdk";
 import { TypeCookies, TypeRequestandHeaderResponse } from "./types";
-import { KAMELEOON_USER_ID } from "./constants";
+import { KAMELEOON_COOKIE_KEY } from "./constants";
 
 /**
  * generateRandomUserId - Generates a random User ID.
@@ -50,7 +50,7 @@ export function getUserId(cookieHeader: TypeCookies[]): string {
     const cookieValue = cookieHeader[0].value;
     const cookies = cookie.parse(cookieValue);
 
-    userId = cookies[KAMELEOON_USER_ID] || "";
+    userId = cookies[KAMELEOON_COOKIE_KEY] || "";
   }
 
   return userId;
@@ -64,7 +64,7 @@ export function getUserId(cookieHeader: TypeCookies[]): string {
  */
 async function getClientConfigRequest(
   url: string
-): Promise<GetClientConfigurationResultType> {
+): Promise<ConfigurationDataType> {
   console.log("[KAMELEOON] Retrieving client config...");
 
   const urlObj = new URL(url);
@@ -107,7 +107,7 @@ async function getClientConfigRequest(
 
 // const CLIENT_CONFIG_TTL = 3_600_000; // 1 Hour
 const CLIENT_CONFIG_TTL: number = 60_000; // 1 Minute
-let clientConfig: GetClientConfigurationResultType | null = null;
+let clientConfig: ConfigurationDataType | null = null;
 let clientConfigLastFetchedTime: number = 0; // Last time the client confiruation was fetched.
 
 /**
@@ -121,7 +121,7 @@ let clientConfigLastFetchedTime: number = 0; // Last time the client confiruatio
  */
 export async function getClientConfig(
   siteCode: string
-): Promise<GetClientConfigurationResultType | null> {
+): Promise<ConfigurationDataType | null> {
   console.log("[KAMELEOON] Getting client config...");
 
   // Get the Kameleoon Client Configuration URL from KameleoonUtils

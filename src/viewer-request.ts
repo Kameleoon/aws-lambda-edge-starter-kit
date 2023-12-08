@@ -7,7 +7,7 @@ import {
   getRequestAndHeaders,
   getUserId,
 } from "./helpers";
-import { KAMELEOON_USER_ID } from "./constants";
+import { KAMELEOON_COOKIE_KEY } from "./constants";
 
 const KAMELEOON_SITE_CODE = "YOUR_SITE_CODE";
 
@@ -38,7 +38,7 @@ exports.handler = async (
       headers.Cookie = [
         {
           key: "Cookie",
-          value: cookie.serialize(KAMELEOON_USER_ID, userId),
+          value: cookie.serialize(KAMELEOON_COOKIE_KEY, userId),
         },
       ];
     }
@@ -54,6 +54,10 @@ exports.handler = async (
     // You can initialize the KameleoonClient outside of Lambda Function, this way in warm start it is not created again.
     const kameleoonClient = new KameleoonClient({
       siteCode: KAMELEOON_SITE_CODE,
+      credentials: {
+        clientId: "YOUR_CLIENT_ID",
+        clientSecret: "YOUR_CLIENT_SECRET",
+      },
       integrations: {
         externalClientConfiguration: clientConfig ?? undefined,
       },

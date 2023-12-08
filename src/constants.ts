@@ -1,1 +1,1 @@
-export const KAMELEOON_USER_ID = "kameleoon_user_id";
+export const KAMELEOON_COOKIE_KEY = "kameleoonVisitorCode";
