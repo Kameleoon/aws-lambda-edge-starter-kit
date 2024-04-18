@@ -1,5 +1,7 @@
 import { CloudFrontRequestEvent, CloudFrontRequest } from "aws-lambda";
 import cookie from "cookie";
+import { KameleoonVisitorCodeManager } from "@kameleoon/nodejs-visitor-code-manager";
+import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
 import { KameleoonClient } from "@kameleoon/nodejs-sdk";
 import {
   getClientConfig,
@@ -60,6 +62,10 @@ exports.handler = async (
       },
       integrations: {
         externalClientConfiguration: clientConfig ?? undefined,
+      },
+      externals: {
+        visitorCodeManager: new KameleoonVisitorCodeManager(),
+        eventSource: new KameleoonEventSource(),
       },
     });
 
