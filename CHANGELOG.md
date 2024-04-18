@@ -5,6 +5,16 @@ All notable changes to this AWS Lambda@Edge project will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.4] - April 18, 2024
+
+### Changed
+
+- Bump @kameleoon/nodejs-sdk version to 4.0.1
+
+### Fixed
+
+- `package-lock.json` was referencing internal Kameleoon Repository
+
 ## [1.0.3] - December 08, 2023
 
 ### Changed

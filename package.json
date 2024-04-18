@@ -1,6 +1,6 @@
 {
   "name": "aws-lambda-edge-starter-kit",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Kameleoon Starter Kit for running edge compute experiments on AWS Lambda@Edge.",
   "main": "src/index.js",
   "scripts": {
