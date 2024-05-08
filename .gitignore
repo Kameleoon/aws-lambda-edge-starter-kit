@@ -1,2 +1,9 @@
+# Node Modules
 node_modules/
+
+# Build files
 dist/
+lambda/handler.js
+
+# AWS Lambda
+lambda.zip
