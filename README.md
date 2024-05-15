@@ -67,10 +67,10 @@ In the `src` folder of the starter kit, you will find two TypeScript files:
 
 You'll use these files to initialize your environment:
 
-1. Navigate to `src/handler.ts` and update the `SITE_CODE`, `CLIENT_ID`, `CLIENT_SECRET` and `FEATURE_KEY` with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials) and feature flag data collected on Kameleoon Platform.
-1. Review or adjust the feature flags or experiments you've configured with the Kameleoon NodeJS SDK, and hook into the lifecycle events by inserting your desired logic in `src/handler.ts`. For example, you can change headers, cookies, and more.
+1. Navigate to `src/handler.ts` and update the `SITE_CODE`, `CLIENT_ID`, `CLIENT_SECRET` and `FEATURE_KEY` with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials) and feature flag data collected on the Kameleoon Platform.
+1. Review or adjust the feature flags or experiments you've configured with the Kameleoon NodeJS SDK, and hook into the lifecycle events by adding your own logic in `src/handler.ts`. For example, you can change headers, cookies, and more.
 1. Run `npm run build:lambda` to bundle the source code into a `dist/handler.zip` file that you'll import into Lambda.
-1. Upload the handler `dist/handler.zip` file into Lambda using one of these options:
+1. Upload the `dist/handler.zip` file into Lambda using one of these options:
    - **GUI**: Go to your AWS Lambda console, select the function associated with your Lambda environment, and import the `dist/handler.zip` file. After you upload it, there should now be a minified `index.js` file located inside of your Lambda function's **Code Source** section.
    - **CLI**: You can use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to update your AWS Lambda function programmatically. Example command:
      ```
@@ -96,14 +96,14 @@ You can now use Kameleoon's feature flagging and experimentation as desired. You
 
 ### Testing Locally
 
-To avoid the need to upload your Lambda function to AWS every time you make a change, you can test your Lambda function locally using the `AWS SAM` runtime interface client.
+To avoid uploading your Lambda function to AWS every time you make a change, you can test your Lambda function locally using the `AWS SAM` runtime interface client.
 
 1. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
 2. Run `npm run test:viewer_request` to build the lambda and run it locally with the `viewer-request` event.
 
-You can also run lambda handler using `viewer-response`/`origin-request`/`origin-response` events by running respective [commands](#commands).
+You can also run lambda handler using `viewer-response`/`origin-request`/`origin-response` events by running the related [commands](#commands).
 
-Additionally you can change the configuration of lambda providing additional parameters to `template.yaml` or by modifying template event files in `lambda` folder.
+Additionally you can change the configuration of lambda by providing additional parameters to `template.yaml` or by modifying the template event files in the `lambda` folder.
 
 ### Commands
 
@@ -122,7 +122,7 @@ The following commands are available in the starter kit:
 
 ### External Data Fetching & Caching
 
-SDK configuration and collected data is stored in-memory in the Lambda function. In some cases, when the data is too large, it may cause the Lambda function to break. We address this issue by giving the developers option to cache the data more efficiently by using AWS services like `S3`, `DynamoDB`, or `CloudFront`.
+SDK configuration and collected data is stored in-memory in the Lambda function. In some cases, when the data is too large, the Lambda function may break. To address this, you can cache the data more efficiently using AWS services like `S3`, `DynamoDB`, or `CloudFront`.
 
 You can find basic examples of caching SDK configuration in `src/examples/configurationCache.ts` and caching SDK stored data in `src/examples/dataCache.ts`. These basic examples store data in AWS Lambda cache for more details on working with AWS service reference [official AWS documentation](https://aws.amazon.com/blogs/networking-and-content-delivery/leveraging-external-data-in-lambdaedge/).
 
