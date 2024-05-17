@@ -2,11 +2,11 @@
   "name": "aws-lambda-edge-starter-kit",
   "version": "1.0.4",
   "description": "Kameleoon Starter Kit for running edge compute experiments on AWS Lambda@Edge.",
-  "main": "dist/handler.js",
+  "main": "dist/index.js",
   "scripts": {
-    "clean": "rimraf dist && rimraf lambda/handler.js",
+    "clean": "rimraf dist && rimraf lambda/index.js",
     "build": "npm run clean && tsc --noEmit && rollup -c",
-    "build:lambda": "npm run build -- --environment ZIP",
+    "build:lambda": "npm run build && npm-build-zip --source=dist --destination=dist --name=handler --name_only=true",
     "test:viewer-request": "npm run build -- --environment TEST && sam local invoke -e ./lambda/viewer_request.json KameleoonLambdaFunction",
     "test:viewer-response": "npm run build -- --environment TEST && sam local invoke -e ./lambda/viewer_response.json KameleoonLambdaFunction",
     "test:origin-request": "npm run build -- --environment TEST && sam local invoke -e ./lambda/origin_request.json KameleoonLambdaFunction",
@@ -48,11 +48,11 @@
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@types/aws-lambda": "^8.10.119",
     "aws-lambda": "^1.0.7",
+    "npm-build-zip": "^1.0.4",
     "rimraf": "^5.0.5",
     "rollup": "^2.79.1",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-zip": "^1.0.3",
     "typescript": "^5.4.5"
   }
 }

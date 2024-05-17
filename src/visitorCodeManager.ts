@@ -23,7 +23,7 @@ export class LambdaVisitorCodeManager
     }
 
     const request = (event as CloudFrontRequestEvent).Records[0].cf.request;
-    const headers = request.headers ?? {};
+    const headers = request?.headers ?? {};
     const cookieHeader = headers["cookie"];
 
     if (!cookieHeader) {
@@ -63,7 +63,7 @@ export class LambdaVisitorCodeManager
       }
 
       const headers = (event as CloudFrontResponseEvent).Records[0].cf.response
-        .headers;
+        ?.headers;
 
       if (!headers) {
         return;
