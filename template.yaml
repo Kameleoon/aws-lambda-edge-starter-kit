@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: 
+  Kameleoon Lambda function Test
+
+Resources:
+  KameleoonLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: handler.handler
+      Runtime: nodejs16.x
+      Description: Kameleoon Lambda function
+

@@ -4,9 +4,24 @@
 
 This repository is home to the Kameleoon starter kit for AWS Lambda@Edge. Kameleoon is a powerful experimentation and personalization platform for product teams that enables you to make insightful discoveries by testing the features on your roadmap. Discover more at https://kameleoon.com, or see the [developer documentation](https://developers.kameleoon.com).
 
+## Contents
+
+- [Getting started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Set up the edge environment](#set-up-the-edge-environment)
+  - [Install the starter kit](#install-the-starter-kit)
+- [Use the AWS Lambda@Edge Starter Kit](#use-the-aws-lambdaedge-starter-kit)
+- [Development](#development)
+  - [Testing Locally](#testing-locally)
+  - [Commands](#commands)
+- [Additional Resources and Concepts](#additional-resources-and-concepts)
+  - [External Data Fetching & Caching](#external-data-fetching--caching)
+  - [Identity Management](#identity-management)
+  - [AWS Lambda@Edge and Kameleoon resources](#aws-lambdaedge-and-kameleoon-resources)
+
 ## Getting started
 
-This starter kit provides quickstart instructions for developers using the [Kameleoon NodeJS SDK](https://developers.kameleoon.com/feature-management-and-experimentation/web-sdks/nodejs-sdk) with AWS Lambda@Edge.
+This starter kit provides quick start instructions for developers using the [Kameleoon NodeJS SDK](https://developers.kameleoon.com/feature-management-and-experimentation/web-sdks/nodejs-sdk) with AWS Lambda@Edge.
 
 ### Prerequisites
 
@@ -43,59 +58,81 @@ After your Lambda@Edge environment is prepared, install the starter kit:
 
 The Kameleoon AWS Lambda@Edge Starter Kit uses and extends the [Kameleoon NodeJS SDK](https://developers.kameleoon.com/feature-management-and-experimentation/web-sdks/nodejs-sdk) to provide experimentation and feature flagging on the edge.
 
-> Note: To run the Kameleoon NodeJS SDK on the edge, you need to provide an `externalClientConfiguration`. This can be accomplished either by referencing a local file or using the supplied `getClientConfiguration` helper function to retrieve your Kameleoon project's client configuration. The `externalClientConfiguration` is a JSON file that encapsulates all of your feature flags and experiments. The Kameleoon NodeJS SDK needs this data to implement and monitor your feature flag deployments and experiments.
-
 ### Initialization
 
-In the `src` folder of the starter kit, you'll find three JavaScript files:
+In the `src` folder of the starter kit, you will find two TypeScript files:
 
-- `src/viewer_request.js` contains sample code that fetches and caches the client configuration, initializes the Kameleoon SDK with this configuration, and modifies the outgoing request by adding the User ID cookie and feature flag value to the header.
-- `src/viewer_response.js` file contains sample code that fetches the User ID cookie from the incoming request and attaches the cookie to the outgoing response.
-- `src/helpers.js` contains some additional platform-specific code that demonstrates common features of the Kameleoon SDK.
+- `src/handler.ts` contains sample code that initializes and caches the Kameleoon SDK and retrieves the feature flag variation.
+- `src/visitorCodeManager.ts` file contains a custom implementation of Kameleoon Visitor Code Manager, which provides an ability to work with Kameleoon `visitorCode` at the edge.
 
 You'll use these files to initialize your environment:
 
-1. Navigate to `src/viewer_request.js` and update the `YOUR_SITE_CODE`, `YOUR_FEATURE_KEY`, `YOUR_CLIENT_ID` and `YOUR_CLIENT_SECRET` values with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials).
-1. Review or adjust the feature flags or experiments you've configured with the Kameleoon NodeJS SDK, and hook into the lifecycle events by inserting your desired logic into the switch-case statements in `src/viewer_request.js` and `src/viewer_response.js`. For example, you can change headers, cookies, and more.
-1. Run `npm run build:viewer_request` to use Rollup to bundle the source code of `src/viewer_request.js` into a `dist/dist.zip` file that you'll import into Lambda. The `dist.zip` file should be roughly **~49kb** in size for `src/viewer_request.js` assuming you have not made any additional changes.
-1. Upload the request `dist/dist.zip` file into Lambda using one of these options:
-   - **GUI**: Go to your AWS Lambda console, select the function associated with your Lambda environment, and import the `dist.zip` file. After you upload it, there should now be a minified `index.js` file located inside of your Lambda function's **Code Source** section.
+1. Navigate to `src/handler.ts` and update the `SITE_CODE`, `CLIENT_ID`, `CLIENT_SECRET` and `FEATURE_KEY` with your [Kameleoon credentials](https://help.kameleoon.com/api-credentials) and feature flag data collected on the Kameleoon Platform.
+1. Review or adjust the feature flags or experiments you've configured with the Kameleoon NodeJS SDK, and hook into the lifecycle events by adding your own logic in `src/handler.ts`. For example, you can change headers, cookies, and more.
+1. Run `npm run build:lambda` to bundle the source code into a `dist/handler.zip` file that you'll import into Lambda.
+1. Upload the `dist/handler.zip` file into Lambda using one of these options:
+   - **GUI**: Go to your AWS Lambda console, select the function associated with your Lambda environment, and import the `dist/handler.zip` file. After you upload it, there should now be a minified `index.js` file located inside of your Lambda function's **Code Source** section.
    - **CLI**: You can use the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) to update your AWS Lambda function programmatically. Example command:
      ```
-     aws lambda update-function-code --function-name my-aws-lambda-at-edge-function --zip-file fileb://dist.zip
+     aws lambda update-function-code --function-name my-aws-lambda-at-edge-function --zip-file fileb://dist/handler.zip
      ```
-1. Run `npm run build:viewer_response` to do the same for `src/viewer_response.js`. After running this command, the `dist/dist.zip` file should be roughly **~1.7kb** in size for `src/viewer_response.js`. This command overwrites the previous `dist/dist.zip` file. Don't run the command until after you've uploaded the request file.
-1. Upload the response `dist/dist.zip` file into Lambda.
+1. Upload the response `dist/handler.zip` file into Lambda.
 
    > **Lambda Layers**: If you need additional libraries, custom runtimes, or configuration files to use alongside your Lambda function, consider using [Lambda Layers](https://docs.aws.amazon.com/lambda/latest/dg/invocation-layers.html).
 
-1. Provision the function with [Lambda@Edge permissions](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-permissions.html) and [associate the function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/associate-function.html) with your CloudFront distribution. Set the CloudFront trigger for this function to be `Viewer Request`.
+1. Provision the function with [Lambda@Edge permissions](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-permissions.html) and [associate the function](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/associate-function.html) with your CloudFront distribution.
 
    > Note: CloudFront triggers are associated with only one specific version of your Lambda function. Remember to update the CloudFront trigger assignment as needed when pushing new versions of your Lambda function. For example, you may need one function that handles receiving viewer requests (viewer request trigger) and one function that handles returning a response to the viewer (viewer response trigger).
 
 1. Test your Lambda@Edge function. It should return a simple home page with the results of your feature flag test and User ID cookie.
 
-   > You can find details on how the starter kit works in the CloudWatch console under **Logs > Log groups > /aws/lambda/<YOUR_LAMBDA_NAME>**. Click your Lambda's log group to follow the entire process of reading the headers, assigning the User ID, fetching the client configuration, and getting a variation key for a particular User ID using the Kameleoon NodeJS SDK.
+   > You can find details on how the starter kit works in the CloudWatch console under **Logs > Log groups > /aws/lambda/<YOUR_LAMBDA_NAME>**. Click your Lambda's log group to follow the entire process.
 
 1. Adjust your lambda's configuration as needed. For example, you may need to increase your function's memory, storage, and timeout threshold to accommodate your needs.
 
 You can now use Kameleoon's feature flagging and experimentation as desired. You can modify the cookies and headers based on experimentation results, add hooks to the **Origin Request** and **Origin Response** CloudFront triggers to perform origin redirects or dynamic asset manipulation, or add more services to the pipeline including your own logging systems, databases, CDN origins, and more. Keep in mind that Lambda@Edge has some limitations, which you can familiarize yourself with in the [Edge Functions Restrictions](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/edge-functions-restrictions.html) article.
 
+## Development
+
+### Testing Locally
+
+To avoid uploading your Lambda function to AWS every time you make a change, you can test your Lambda function locally using the `AWS SAM` runtime interface client.
+
+1. Install the [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html).
+2. Run `npm run test:viewer_request` to build the lambda and run it locally with the `viewer-request` event.
+
+You can also run lambda handler using `viewer-response`/`origin-request`/`origin-response` events by running the related [commands](#commands).
+
+Additionally you can change the configuration of lambda by providing additional parameters to `template.yaml` or by modifying the template event files in the `lambda` folder.
+
+### Commands
+
+The following commands are available in the starter kit:
+
+- `npm run build` - Builds the TypeScript files in the `src/` directory creating `dist/handler.js` (ignores `src/examples`).
+- `npm run build:lambda` - Builds the Lambda function and creates a `dist/handler.zip` file.
+- `npm run test:viewer_request` - Runs the Lambda function locally with the `lambda/viewer-request.json` event.
+- `npm run test:viewer_response` - Runs the Lambda function locally with the `lambda/viewer-response.json` event.
+- `npm run test:origin_request` - Runs the Lambda function locally with the `lambda/origin-request.json` event.
+- `npm run test:origin_response` - Runs the Lambda function locally with the `lambda/origin-response.json` event.
+- `npm run clean` - Removes the `dist/` directory.
+
+
 ## Additional Resources and Concepts
 
 ### External Data Fetching & Caching
 
-This starter kit uses standard ES7 async and await fetch methods to handle external data fetching. After fetching the Kameleoon client configuration, the SDK caches the client configuration as a JSON object in-memory. However, very large client configurations may cause the method presented in this starter kit to break. If you experience issues with large datafiles breaking in-memory Lambda caching, consider one of the alternative methods of caching with Lambda@Edge outlined in this [external data](https://aws.amazon.com/blogs/networking-and-content-delivery/leveraging-external-data-in-lambdaedge/) article.
+SDK configuration and collected data is stored in-memory in the Lambda function. In some cases, when the data is too large, the Lambda function may break. To address this, you can cache the data more efficiently using AWS services like `S3`, `DynamoDB`, or `CloudFront`.
 
-Alternative methods for in-memory data caching include using a persistent connection to your client configuration JSON or caching using CloudFront.
-
-For even faster data fetching, consider storing your data file in an S3 bucket that you own and refactor the client configuration fetching mechanism to use Lambda's built-in AWS SDK library to fetch from your S3 bucket instead.
+You can find basic examples of caching SDK configuration in `src/examples/configurationCache.ts` and caching SDK stored data in `src/examples/dataCache.ts`. These basic examples store data in AWS Lambda cache for more details on working with AWS service reference [official AWS documentation](https://aws.amazon.com/blogs/networking-and-content-delivery/leveraging-external-data-in-lambdaedge/).
 
 > Note: Additional caching mechanisms may be available depending on your CloudFront distribution's configuration.
 
 ### Identity Management
 
-Out of the box, Kameleoon's SDKs require a user-provided identifier at runtime to drive experimentation and feature flag results. If the client doesn't provide the User ID directly, this starter kit generates a unique ID as a fallback, stores it into the cookie, and re-uses it to ensure decisions are consistent throughout the user session. Alternatively, you can use an existing unique identifier available within your application and pass it in as the value for the `KAMELEOON_COOKIE_KEY` cookie.
+Out of the box, our starter kit uses a basic implementation of `KameleoonVisitorCodeManager` found in `src/visitorCodeManager.ts`. This implementation allows for basic Kameleoon Visitor Code reads and writes using lambda handler's `request` and `response` objects making the use of `getVisitorCode` method seamless.
+Alternatively you can use your own User ID or other identifier as a visitor code.
+
 
 ### AWS Lambda@Edge and Kameleoon resources
 
@@ -107,3 +144,4 @@ For more information about AWS Lambda@Edge and Kameleoon, see the following reso
 - [Example Lambda Functions](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-examples.html)
 - [Kameleoon NodeJS SDK documentation](https://developers.kameleoon.com/feature-management-and-experimentation/web-sdks/nodejs-sdk)
 - [Kameleoon Serverless edge compute starter kits](https://developers.kameleoon.com/feature-management-and-experimentation/serverless-edge-compute-starter-kits)
+

@@ -5,6 +5,12 @@ All notable changes to this AWS Lambda@Edge project will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - May 8, 2024
+
+### Changed
+
+- Overhaul of the project structure to make it more modular and easier to maintain.
+
 ## [1.0.4] - April 18, 2024
 
 ### Changed
