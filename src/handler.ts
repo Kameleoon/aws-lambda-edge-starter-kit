@@ -53,6 +53,7 @@ exports.handler = async (
     //    or generating a new one if it doesn't exist
     // -- Setting the visitor code to the `response` cookie
     //    if event type is `viewer_response` or `origin_response`
+    //    Or updating `request` cookie if event type is `viewer_request` or `origin_request`
     const visitorCode = kameleoonClient.getVisitorCode({
       input: event,
       output: event,
