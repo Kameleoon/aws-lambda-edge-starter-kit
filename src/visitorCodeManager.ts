@@ -90,7 +90,7 @@ export class LambdaVisitorCodeManager
 
       headers["cookie"] = [
         {
-          key: "cookie",
+          key: "Cookie",
           value: cookies,
         },
       ];

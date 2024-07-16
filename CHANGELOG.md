@@ -5,6 +5,13 @@ All notable changes to this AWS Lambda@Edge project will be documented in this f
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [2.1.1] - July 16, 2024
+
+### Changed
+
+- Bump @kameleoon/nodejs-sdk version to 4.4.3 containing the fix for setting `visitorCode` in `viewer_request` and `origin_request` request cookies
+
 ## [2.1.0] - July 12, 2024
 
 ### Changed
