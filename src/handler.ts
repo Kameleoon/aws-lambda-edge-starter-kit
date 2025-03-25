@@ -6,6 +6,7 @@ import {
 } from "aws-lambda";
 import { KameleoonClient, KameleoonError } from "@kameleoon/nodejs-sdk";
 import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
+import { KameleoonRequester } from "@kameleoon/nodejs-requester";
 import { LambdaVisitorCodeManager } from "./visitorCodeManager";
 
 const SITE_CODE = "my_site_code";
@@ -39,6 +40,7 @@ exports.handler = async (
         externals: {
           visitorCodeManager: new LambdaVisitorCodeManager(),
           eventSource: new KameleoonEventSource(),
+          requester: new KameleoonRequester(),
         },
       });
     }
@@ -61,15 +63,16 @@ exports.handler = async (
 
     console.log(`[KAMELEOON]: Visitor Code: ${visitorCode}`);
 
-    // -- Getting the variation key for the feature flag
-    const variationKey = kameleoonClient.getFeatureFlagVariationKey(
-      visitorCode,
-      FEATURE_KEY
-    );
+    // -- Getting the variation for the feature flag
+    const variation = kameleoonClient.getVariation({
+        visitorCode: visitorCode,
+        featureKey: FEATURE_KEY,
+        track: false
+    });
 
-    console.log(`[KAMELEOON]: Feature Flag Variation: ${variationKey}`);
+    console.log(`[KAMELEOON]: Feature Flag Variation: ${variation}`);
 
-    // -- You can now use the `visitorCode` and `variationKey` to personalize the content
+    // -- You can now use the `visitorCode` and `variation` to personalize the content
     //    Your code here...
 
     // -- This part can be omitted if it's certain what type of event is being processed

@@ -9,6 +9,6 @@ Resources:
     Properties:
       CodeUri: lambda/
       Handler: handler.handler
-      Runtime: nodejs16.x
+      Runtime: nodejs18.x
       Description: Kameleoon Lambda function
 

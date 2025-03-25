@@ -4,10 +4,13 @@ import {
   CloudFrontResponse,
 } from "aws-lambda";
 import {
-  ConfigurationDataType,
-  Environment,
+  IExternalRequester,
   KameleoonClient,
+  KameleoonResponseType,
+  RequestType,
+  SendRequestParametersType,
   KameleoonUtils,
+  ConfigurationDataType
 } from "@kameleoon/nodejs-sdk";
 import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
 import { LambdaVisitorCodeManager } from "../visitorCodeManager";
@@ -18,34 +21,39 @@ const CLIENT_SECRET = "my_client_secret";
 
 let configurationCache: ConfigurationDataType;
 
-// -- Getting configuration using Kameleoon Provided URL
-//    Note: for `nodejs16` and lower use `https` instead of `fetch`
-// -- In the example we store cached data in lambda memory,
-//    but it can be stored in any AWS service like S3, DynamoDB, etc.
-async function getKameleoonConfiguration(): Promise<ConfigurationDataType> {
-  const url = KameleoonUtils.getClientConfigurationUrl(
-    SITE_CODE,
-    Environment.Production
-  );
-  const response = await fetch(url);
+// --- External Requester Implementation
+// Note: for `nodejs16` and lower use `https` instead of `fetch`
+export class CacheRequester implements IExternalRequester {
+  public async sendRequest({
+    requestType,
+    url,
+    parameters,
+  }: SendRequestParametersType<RequestType>): Promise<KameleoonResponseType> {
+    if (requestType === RequestType.Configuration) {
+      // -- Your code here for configuration request or cache
+      if (!configurationCache) {
+        const response = await fetch(url, parameters);
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch Kameleoon configuration");
+        if (!response.ok) {
+          throw new Error("Failed to fetch Kameleoon configuration");
+        }
+
+        configurationCache = await response.json();
+      }
+
+      return KameleoonUtils.simulateSuccessRequest<RequestType.Configuration>(
+          requestType,
+          configurationCache,
+      );
+    }
+    return await fetch(url, parameters);
   }
-
-  const configuration = await response.json();
-
-  return configuration;
 }
 
 exports.handler = async (
   event: CloudFrontRequestEvent
 ): Promise<CloudFrontRequest | CloudFrontResponse | null> => {
   try {
-    if (!configurationCache) {
-      configurationCache = await getKameleoonConfiguration();
-    }
-
     const kameleoonClient = new KameleoonClient({
       siteCode: SITE_CODE,
       credentials: {
@@ -55,10 +63,7 @@ exports.handler = async (
       externals: {
         visitorCodeManager: new LambdaVisitorCodeManager(),
         eventSource: new KameleoonEventSource(),
-      },
-      // -- Providing the configuration to the client
-      integrations: {
-        externalClientConfiguration: configurationCache,
+        requester: new CacheRequester(),
       },
     });
 
