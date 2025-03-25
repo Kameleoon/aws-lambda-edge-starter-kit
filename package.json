@@ -1,6 +1,6 @@
 {
   "name": "aws-lambda-edge-starter-kit",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Kameleoon Starter Kit for running edge compute experiments on AWS Lambda@Edge.",
   "main": "dist/index.js",
   "scripts": {
@@ -35,8 +35,9 @@
   },
   "homepage": "https://github.com/Kameleoon/aws-lambda-edge-starter-kit#readme",
   "dependencies": {
-    "@kameleoon/nodejs-event-source": "^1.0.0",
-    "@kameleoon/nodejs-sdk": "^4.4.3"
+    "@kameleoon/nodejs-event-source": "^1.1.0",
+    "@kameleoon/nodejs-requester": "^1.2.0",
+    "@kameleoon/nodejs-sdk": "^5.9.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
@@ -54,5 +55,6 @@
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-terser": "^7.0.2",
     "typescript": "^5.4.5"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

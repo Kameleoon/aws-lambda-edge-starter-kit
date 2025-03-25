@@ -6,6 +6,7 @@ import {
 } from "aws-lambda";
 import { KameleoonClient, KameleoonError } from "@kameleoon/nodejs-sdk";
 import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
+import { KameleoonRequester } from "@kameleoon/nodejs-requester";
 import { LambdaVisitorCodeManager } from "./visitorCodeManager";
 
 const SITE_CODE = "my_site_code";
@@ -39,6 +40,7 @@ exports.handler = async (
         externals: {
           visitorCodeManager: new LambdaVisitorCodeManager(),
           eventSource: new KameleoonEventSource(),
+          requester: new KameleoonRequester(),
         },
       });
     }
@@ -62,10 +64,12 @@ exports.handler = async (
     console.log(`[KAMELEOON]: Visitor Code: ${visitorCode}`);
 
     // -- Getting the variation key for the feature flag
-    const variationKey = kameleoonClient.getFeatureFlagVariationKey(
-      visitorCode,
-      FEATURE_KEY
-    );
+    const variation = kameleoonClient.getVariation({
+        visitorCode: visitorCode,
+        featureKey: FEATURE_KEY,
+        track: false
+    });
+    const variationKey = variation?.key;
 
     console.log(`[KAMELEOON]: Feature Flag Variation: ${variationKey}`);
 

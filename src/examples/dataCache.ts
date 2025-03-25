@@ -6,6 +6,7 @@ import {
 import { IExternalStorage, KameleoonClient } from "@kameleoon/nodejs-sdk";
 import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
 import { LambdaVisitorCodeManager } from "../visitorCodeManager";
+import { KameleoonRequester } from "@kameleoon/nodejs-requester";
 
 const SITE_CODE = "my_site_code";
 const CLIENT_ID = "my_client_id";
@@ -57,6 +58,7 @@ exports.handler = async (
         eventSource: new KameleoonEventSource(),
         // -- Providing the storage to the client
         storage: new LambdaStorage(),
+        requester: new KameleoonRequester(),
       },
     });
 
