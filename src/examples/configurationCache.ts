@@ -10,7 +10,7 @@ import {
   RequestType,
   SendRequestParametersType,
   KameleoonUtils,
-  ConfigurationDataType
+  ConfigurationDataType,
 } from "@kameleoon/nodejs-sdk";
 import { KameleoonEventSource } from "@kameleoon/nodejs-event-source";
 import { LambdaVisitorCodeManager } from "../visitorCodeManager";
@@ -30,7 +30,8 @@ export class CacheRequester implements IExternalRequester {
     parameters,
   }: SendRequestParametersType<RequestType>): Promise<KameleoonResponseType> {
     if (requestType === RequestType.Configuration) {
-      // -- Your code here for configuration request or cache
+      // -- This block handles configuration requests and caching.
+      // -- Modify if caching behavior needs to change.
       if (!configurationCache) {
         const response = await fetch(url, parameters);
 
@@ -41,9 +42,10 @@ export class CacheRequester implements IExternalRequester {
         configurationCache = await response.json();
       }
 
+      // -- The `simulateSuccessRequest` call is required if the configuration was fetched in the block above.
       return KameleoonUtils.simulateSuccessRequest<RequestType.Configuration>(
-          requestType,
-          configurationCache,
+        requestType,
+        configurationCache
       );
     }
     return await fetch(url, parameters);
