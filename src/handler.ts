@@ -63,17 +63,16 @@ exports.handler = async (
 
     console.log(`[KAMELEOON]: Visitor Code: ${visitorCode}`);
 
-    // -- Getting the variation key for the feature flag
+    // -- Getting the variation for the feature flag
     const variation = kameleoonClient.getVariation({
         visitorCode: visitorCode,
         featureKey: FEATURE_KEY,
         track: false
     });
-    const variationKey = variation?.key;
 
-    console.log(`[KAMELEOON]: Feature Flag Variation: ${variationKey}`);
+    console.log(`[KAMELEOON]: Feature Flag Variation: ${variation}`);
 
-    // -- You can now use the `visitorCode` and `variationKey` to personalize the content
+    // -- You can now use the `visitorCode` and `variation` to personalize the content
     //    Your code here...
 
     // -- This part can be omitted if it's certain what type of event is being processed
